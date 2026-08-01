@@ -3,9 +3,9 @@
     "relation": ["delegate_permission/common.handle_all_urls"],
     "target": {
       "namespace": "android_app",
-      "package_name": "com.shobdokosh.app",
+      "package_name": "studio.ai.service_5743.twa",
       "sha256_cert_fingerprints": [
-        "YOUR_SHA256_FINGERPRINT_HERE"
+        "49:56:54:FE:B4:3D:BF:37:1E:3C:A5:A2:56:9C:22:58:11:1D:64:B3:41:CC:44:2B:38:4B:B0:92:8C:71:BA:D5"
       ]
     }
   }
