@@ -1,0 +1,141 @@
+import React from 'react';
+
+interface AppLogoProps {
+  size?: number;
+  className?: string;
+}
+
+export const AppLogo: React.FC<AppLogoProps> = ({ size = 56, className = '' }) => {
+  return (
+    <div
+      style={{ width: size, height: size }}
+      className={`relative inline-block shrink-0 rounded-full select-none cursor-pointer hover:scale-105 active:scale-95 transition-transform ${className}`}
+    >
+      <svg
+        width={size}
+        height={size}
+        viewBox="0 0 100 100"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        className="w-full h-full filter drop-shadow-[2px_3px_5px_rgba(34,49,77,0.3)]"
+      >
+        <defs>
+          {/* Metallic Gold Gradient */}
+          <linearGradient id="goldBorder" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#FFE082" />
+            <stop offset="30%" stopColor="#D4AF37" />
+            <stop offset="70%" stopColor="#AA7C11" />
+            <stop offset="100%" stopColor="#FFF176" />
+          </linearGradient>
+
+          {/* Deep Blue Textured Background Gradient */}
+          <radialGradient id="blueBG" cx="50%" cy="50%" r="50%" fx="30%" fy="30%">
+            <stop offset="0%" stopColor="#1C5288" />
+            <stop offset="65%" stopColor="#0E335C" />
+            <stop offset="100%" stopColor="#081E38" />
+          </radialGradient>
+
+          {/* Book Gold Trim Gradient */}
+          <linearGradient id="bookGold" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#FFF2B2" />
+            <stop offset="50%" stopColor="#E5B842" />
+            <stop offset="100%" stopColor="#A67C1E" />
+          </linearGradient>
+
+          {/* Book Inner Page Gradient */}
+          <linearGradient id="bookBlue" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="#1B4977" />
+            <stop offset="50%" stopColor="#25629E" />
+            <stop offset="100%" stopColor="#1B4977" />
+          </linearGradient>
+        </defs>
+
+        {/* Outer Golden Border */}
+        <circle cx="50" cy="50" r="48" fill="url(#goldBorder)" stroke="#22314D" strokeWidth="1.5" />
+
+        {/* Inner Blue Disc */}
+        <circle cx="50" cy="50" r="43" fill="url(#blueBG)" />
+        <circle cx="50" cy="50" r="41" fill="none" stroke="url(#goldBorder)" strokeWidth="0.75" strokeOpacity="0.6" />
+
+        {/* Open Book Graphic */}
+        <g transform="translate(18, 22) scale(0.64)">
+          {/* Book Shadow / Outer Gold Spine Base */}
+          <path
+            d="M5 65 C 25 58, 45 65, 50 68 C 55 65, 75 58, 95 65 L 95 18 C 75 10, 55 18, 50 20 C 45 18, 25 10, 5 18 Z"
+            fill="url(#bookGold)"
+            stroke="#22314D"
+            strokeWidth="2"
+          />
+
+          {/* Left Page (Deep Blue with Gold Border) */}
+          <path
+            d="M9 19 C 27 12, 45 19, 48 21 L 48 64 C 45 62, 27 55, 9 62 Z"
+            fill="url(#bookBlue)"
+            stroke="url(#bookGold)"
+            strokeWidth="2.5"
+          />
+
+          {/* Right Page (Deep Blue with Gold Border) */}
+          <path
+            d="M52 21 C 55 19, 73 12, 91 19 L 91 62 C 73 55, 55 62, 52 64 Z"
+            fill="url(#bookBlue)"
+            stroke="url(#bookGold)"
+            strokeWidth="2.5"
+          />
+
+          {/* Center Spine Gold Stripe */}
+          <path d="M48 21 L 52 21 L 52 64 L 48 64 Z" fill="url(#bookGold)" />
+
+          {/* Left Page Letter: Bengali "শ" */}
+          <text
+            x="28"
+            y="48"
+            fill="url(#bookGold)"
+            fontSize="26"
+            fontWeight="900"
+            fontFamily="'Baloo Da 2', 'Hind Siliguri', sans-serif"
+            textAnchor="middle"
+          >
+            শ
+          </text>
+
+          {/* Right Page Letter: English "D" */}
+          <text
+            x="71"
+            y="48"
+            fill="url(#bookGold)"
+            fontSize="26"
+            fontWeight="900"
+            fontFamily="'Quicksand', 'Arial', sans-serif"
+            textAnchor="middle"
+          >
+            D
+          </text>
+        </g>
+
+        {/* Magnifying Glass Overlaid Bottom Right */}
+        <g transform="translate(48, 48) scale(0.9)">
+          {/* Glass Lens Circle Outer Rim */}
+          <circle cx="22" cy="22" r="14" fill="#0E335C" stroke="url(#goldBorder)" strokeWidth="3.5" />
+          {/* Lens Glass Reflection */}
+          <circle cx="22" cy="22" r="10" fill="#25629E" fillOpacity="0.5" />
+          <path d="M16 16 C 18 14, 22 14, 24 15" stroke="#FFFFFF" strokeWidth="1.5" strokeLinecap="round" opacity="0.8" />
+
+          {/* Handle */}
+          <path
+            d="M32 32 L 42 42"
+            stroke="url(#goldBorder)"
+            strokeWidth="5"
+            strokeLinecap="round"
+          />
+          <path
+            d="M32 32 L 42 42"
+            stroke="#22314D"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+          />
+        </g>
+      </svg>
+    </div>
+  );
+};
