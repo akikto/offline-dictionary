@@ -1,0 +1,8 @@
+{
+  "name": "শব্দকোষ - অফলাইন ডিকশনারি",
+  "description": "ইংরেজি ও বাংলা শব্দের অর্থ, উচ্চারণ, উদাহরণ এবং ১০০% অফলাইন সাপোর্ট সহ অভিধান অ্যাপ।",
+  "requestFramePermissions": [
+    "microphone"
+  ],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
