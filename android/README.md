@@ -48,6 +48,9 @@ cd android
 Signed output (when signing is configured):
 
 - `android/app/build/outputs/bundle/release/app-release.aab`
+- Convenience copies (local builds): `android/dist/shobdokosh-1.0.1-versionCode-2.aab` and `android/dist/শব্দকোষ.aab`
+
+Verified with bundletool: `versionCode=2`, `versionName=1.0.1`, package `studio.ai.service_5743.twa`.
 
 Or with Bubblewrap (after `~/.bubblewrap/config.json` exists):
 
