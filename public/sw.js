@@ -1,12 +1,17 @@
 // Service Worker for Shobdokosh Offline Dictionary
-const CACHE_NAME = 'shobdokosh-v1';
+const CACHE_NAME = 'shobdokosh-v2';
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
-  '/src/main.tsx',
-  '/src/App.tsx',
-  '/src/index.css',
-  '/manifest.json'
+  '/manifest.json',
+  '/icon.png',
+  '/icon.svg',
+  '/logo.png',
+  '/favicon.png',
+  '/favicon.ico',
+  '/apple-touch-icon.png',
+  '/pwa-192.png',
+  '/pwa-512.png',
 ];
 
 self.addEventListener('install', (event) => {

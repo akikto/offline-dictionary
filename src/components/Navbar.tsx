@@ -1,5 +1,6 @@
 import React from 'react';
 import { Home, Search, BookOpen, Bookmark, PlusCircle, Award, Wifi, WifiOff, DownloadCloud } from 'lucide-react';
+import { AppLogo } from './AppLogo';
 
 interface NavbarProps {
   activeTab: 'search' | 'categories' | 'bookmarks' | 'custom' | 'quiz' | 'settings';
@@ -58,6 +59,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           className="group text-center inline-flex items-center justify-center gap-3 focus:outline-none cursor-pointer"
           title="হোমে ফিরুন"
         >
+          <AppLogo size={56} className="group-hover:scale-105" />
           <h1 className="font-['Baloo_Da_2','Baloo_2',sans-serif] font-extrabold text-4xl sm:text-5xl text-[#22314D] drop-shadow-[3px_3px_0_#FFC93C] tracking-tight group-hover:scale-[1.02] transition-transform">
             শব্দকোষ
           </h1>
