@@ -1,0 +1,120 @@
+name: Android TWA build
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'android/**'
+      - 'public/**'
+      - 'scripts/generate-android-twa.mjs'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/android-build.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'android/**'
+      - 'public/**'
+      - 'scripts/generate-android-twa.mjs'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/android-build.yml'
+  workflow_dispatch:
+
+env:
+  TWA_HOST: akikto.github.io
+  TWA_START_URL: /offline-dictionary/
+  JAVA_VERSION: '17'
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - name: Install Node dependencies
+        run: npm ci
+
+      - name: Regenerate TWA project
+        run: npm run android:generate
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ env.JAVA_VERSION }}
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Accept Android SDK licenses
+        run: yes | sdkmanager --licenses || true
+
+      - name: Install Android SDK packages
+        run: |
+          sdkmanager \
+            "platform-tools" \
+            "platforms;android-36" \
+            "build-tools;35.0.0"
+
+      - name: Configure release signing
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          KEYSTORE_PATH="android/android.keystore"
+          if [ -n "$ANDROID_KEYSTORE_BASE64" ]; then
+            echo "$ANDROID_KEYSTORE_BASE64" | base64 --decode > "$KEYSTORE_PATH"
+            {
+              echo "RELEASE_STORE_FILE=android.keystore"
+              echo "RELEASE_STORE_PASSWORD=${ANDROID_KEYSTORE_PASSWORD}"
+              echo "RELEASE_KEY_ALIAS=${ANDROID_KEY_ALIAS}"
+              echo "RELEASE_KEY_PASSWORD=${ANDROID_KEY_PASSWORD}"
+            } >> android/gradle.properties
+            echo "Using Play upload keystore from GitHub secrets."
+          else
+            keytool -genkeypair -v \
+              -keystore "$KEYSTORE_PATH" \
+              -alias android \
+              -keyalg RSA -keysize 2048 -validity 10000 \
+              -storepass android -keypass android \
+              -dname "CN=Offline Dictionary CI, OU=CI, O=akikto, L=Unknown, ST=Unknown, C=BD"
+            {
+              echo "RELEASE_STORE_FILE=android.keystore"
+              echo "RELEASE_STORE_PASSWORD=android"
+              echo "RELEASE_KEY_ALIAS=android"
+              echo "RELEASE_KEY_PASSWORD=android"
+            } >> android/gradle.properties
+            echo "::warning::No ANDROID_KEYSTORE_BASE64 secret configured. Built APK/AAB are signed with a CI-only key (Play Store uploads still need the original upload keystore)."
+          fi
+
+      - name: Build release APK and AAB
+        working-directory: android
+        run: |
+          chmod +x ./gradlew
+          ./gradlew --no-daemon assembleRelease bundleRelease
+
+      - name: Upload android-apk artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-apk
+          path: android/app/build/outputs/apk/release/*.apk
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Upload android-aab artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: android-aab
+          path: android/app/build/outputs/bundle/release/*.aab
+          if-no-files-found: error
+          retention-days: 30

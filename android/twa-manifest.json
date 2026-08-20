@@ -1,0 +1,51 @@
+{
+  "packageId": "studio.ai.service_5743.twa",
+  "host": "akikto.github.io",
+  "name": "শব্দকোষ - অফলাইন ডিকশনারি",
+  "launcherName": "শব্দকোষ",
+  "display": "standalone",
+  "themeColor": "#0E335C",
+  "themeColorDark": "#0E335C",
+  "navigationColor": "#0E335C",
+  "navigationColorDark": "#0E335C",
+  "navigationDividerColor": "#00000000",
+  "navigationDividerColorDark": "#00000000",
+  "backgroundColor": "#0E335C",
+  "enableNotifications": false,
+  "startUrl": "/offline-dictionary/",
+  "iconUrl": "../public/icon.png",
+  "maskableIconUrl": "../public/icon.png",
+  "splashScreenFadeOutDuration": 300,
+  "signingKey": {
+    "path": "android.keystore",
+    "alias": "android"
+  },
+  "appVersionName": "1.0.1",
+  "appVersionCode": 2,
+  "appVersion": "1.0.1",
+  "shortcuts": [],
+  "generatorApp": "bubblewrap-cli",
+  "webManifestUrl": null,
+  "fallbackType": "customtabs",
+  "features": {},
+  "alphaDependencies": {
+    "enabled": false
+  },
+  "enableSiteSettingsShortcut": true,
+  "isChromeOSOnly": false,
+  "isMetaQuest": false,
+  "minSdkVersion": 21,
+  "orientation": "portrait",
+  "fingerprints": [
+    {
+      "name": "play-upload",
+      "value": "49:56:54:FE:B4:3D:BF:37:1E:3C:A5:A2:56:9C:22:58:11:1D:64:B3:41:CC:44:2B:38:4B:B0:92:8C:71:BA:D5"
+    }
+  ],
+  "additionalTrustedOrigins": [],
+  "retainedBundles": [],
+  "protocolHandlers": [],
+  "fileHandlers": [],
+  "displayOverride": [],
+  "fullScopeUrl": "https://akikto.github.io/offline-dictionary/"
+}

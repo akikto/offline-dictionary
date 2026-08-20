@@ -1,17 +1,18 @@
 // Service Worker for Shobdokosh Offline Dictionary
-const CACHE_NAME = 'shobdokosh-v2';
+const BASE = '/offline-dictionary';
+const CACHE_NAME = 'shobdokosh-v3';
 const ASSETS_TO_CACHE = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-  '/icon.png',
-  '/icon.svg',
-  '/logo.png',
-  '/favicon.png',
-  '/favicon.ico',
-  '/apple-touch-icon.png',
-  '/pwa-192.png',
-  '/pwa-512.png',
+  `${BASE}/`,
+  `${BASE}/index.html`,
+  `${BASE}/manifest.json`,
+  `${BASE}/icon.png`,
+  `${BASE}/icon.svg`,
+  `${BASE}/logo.png`,
+  `${BASE}/favicon.png`,
+  `${BASE}/favicon.ico`,
+  `${BASE}/apple-touch-icon.png`,
+  `${BASE}/pwa-192.png`,
+  `${BASE}/pwa-512.png`,
 ];
 
 self.addEventListener('install', (event) => {
@@ -42,9 +43,6 @@ self.addEventListener('fetch', (event) => {
   // Only handle GET requests
   if (event.request.method !== 'GET') return;
 
-  // Don't intercept chrome-extension or external origin POST
-  const url = new URL(event.request.url);
-
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
       if (cachedResponse) {
@@ -74,7 +72,7 @@ self.addEventListener('fetch', (event) => {
         console.log('[SW] Network request failed and not in cache:', event.request.url);
         // Fallback to index.html for navigation requests
         if (event.request.mode === 'navigate') {
-          return caches.match('/index.html');
+          return caches.match(`${BASE}/index.html`);
         }
         return new Response('Offline resource unavailable', { status: 503, statusText: 'Offline' });
       });

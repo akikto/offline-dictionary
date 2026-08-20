@@ -14,7 +14,7 @@ export const AppLogo: React.FC<AppLogoProps> = ({
 }) => {
   return (
     <img
-      src="/icon.png"
+      src={`${import.meta.env.BASE_URL}icon.png`}
       width={size}
       height={size}
       alt={alt}
