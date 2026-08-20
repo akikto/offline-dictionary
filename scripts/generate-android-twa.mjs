@@ -178,6 +178,9 @@ async function main() {
     console.log(`[generate-android-twa] versionCode=${twaManifest.appVersionCode} versionName=${twaManifest.appVersionName}`);
     console.log(`[generate-android-twa] host=${twaManifest.host}`);
   } finally {
+    if (typeof server.closeAllConnections === 'function') {
+      server.closeAllConnections();
+    }
     await new Promise((resolve) => server.close(resolve));
   }
 }
