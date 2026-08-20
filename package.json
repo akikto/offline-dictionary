@@ -11,7 +11,9 @@
     "clean": "rm -rf dist server.js",
     "lint": "tsc --noEmit",
     "android:generate": "node scripts/generate-android-twa.mjs",
-    "android:build": "cd android && ./gradlew assembleRelease bundleRelease"
+    "android:build": "cd android && ./gradlew assembleRelease bundleRelease",
+    "android:verify": "node scripts/verify-aab-package.mjs",
+    "android:package": "npm run android:build && node scripts/copy-aab.mjs && npm run android:verify"
   },
   "dependencies": {
     "@google/genai": "^2.4.0",

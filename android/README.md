@@ -4,6 +4,8 @@ Trusted Web Activity wrapper for Play Store uploads. Package ID matches the exis
 
 `studio.ai.service_5743.twa`
 
+**Do not use Bubblewrap’s auto-generated package** (`io.github.akikto.twa` from hostname `akikto.github.io`). Play Console rejects AABs unless the package is exactly `studio.ai.service_5743.twa` (the AI Studio listing ID). This repo pins that ID in `twa-manifest.json`, `app/build.gradle`, and `scripts/generate-android-twa.mjs`.
+
 ## Versioning
 
 | Field | Value |
@@ -32,17 +34,13 @@ Icons are taken from `public/icon.png` (dictionary অ+D mark).
 Requires JDK 17+ and Android SDK command-line tools.
 
 ```bash
-# One-time Bubblewrap tooling config (JDK + SDK paths)
-mkdir -p ~/.bubblewrap
-# Example — adjust paths for your machine:
-# {"jdkPath":"/usr/lib/jvm/java-17-openjdk-amd64","androidSdkPath":"$HOME/Android/Sdk"}
+# From repo root — build, copy to android/dist/, verify package + versionCode:
+npm run android:package
 
-# Create / reuse the Play upload keystore (MUST match the key used for versionCode 1)
-# If you still have the original keystore from AI Studio / PWABuilder / Bubblewrap, point
-# signingKey.path at it in twa-manifest.json.
-
-cd android
-./gradlew bundleRelease
+# Or step by step:
+npm run android:build
+node scripts/copy-aab.mjs
+npm run android:verify
 ```
 
 Signed output (when signing is configured):

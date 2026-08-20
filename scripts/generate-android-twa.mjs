@@ -24,6 +24,10 @@ const androidDir = path.join(root, 'android');
 const publicDir = path.join(root, 'public');
 const manifestPath = path.join(androidDir, 'twa-manifest.json');
 
+// Must match the existing Play Console listing (AI Studio / PWABuilder).
+// Bubblewrap init auto-generates io.github.akikto.twa from the hostname — wrong for this app.
+const PLAY_PACKAGE_ID = 'studio.ai.service_5743.twa';
+
 function resolveHost() {
   if (process.env.TWA_HOST) {
     return process.env.TWA_HOST.replace(/^https?:\/\//, '').replace(/\/$/, '');
@@ -122,6 +126,12 @@ async function main() {
 
   try {
     const raw = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+    if (raw.packageId && raw.packageId !== PLAY_PACKAGE_ID) {
+      console.warn(
+        `[generate-android-twa] Overriding packageId ${raw.packageId} -> ${PLAY_PACKAGE_ID}`,
+      );
+    }
+    raw.packageId = PLAY_PACKAGE_ID;
     raw.host = host;
     raw.startUrl = startUrl;
     raw.appVersion = '1.0.1';
@@ -141,6 +151,7 @@ async function main() {
       JSON.stringify(
         {
           ...raw,
+          packageId: PLAY_PACKAGE_ID,
           // Persist portable relative icon hints for humans; generation uses localhost URLs above.
           iconUrl: '../public/icon.png',
           maskableIconUrl: '../public/icon.png',
