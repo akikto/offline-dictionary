@@ -767,7 +767,7 @@ ${formattedAntonyms}
             <div style="background:white; padding:8px 12px; border-radius:8px; border:1px solid #CBD5E1;">
               <div style="font-size:11px; font-weight:bold; color:#0B8F84;">${e.context}</div>
               <div style="font-weight:600; color:#1E293B;">"${e.english}"</div>
-              <div style="font-size:13px; color:#475569;">🇧🇩 ${e.bengali}</div>
+              <div style="font-size:13px; color:#475569;">${e.bengali}</div>
             </div>
           `).join('')}
         </div>
@@ -1049,7 +1049,7 @@ ${formattedAntonyms}
           </p>
           {defBn ? (
             <p className="font-['Hind_Siliguri',sans-serif] font-bold text-sm sm:text-base text-[#0B8F84] mt-2 bg-[#E4F8EC] px-3.5 py-2 rounded-xl border border-[#0FB5A6]/30 shadow-2xs">
-              🇧🇩 সহজ বাংলা ব্যাখ্যা: {defBn}
+              সহজ বাংলা ব্যাখ্যা: {defBn}
             </p>
           ) : isTranslating ? (
             <div className="text-xs text-[#0B8F84] font-['Hind_Siliguri',sans-serif] mt-1.5 flex items-center gap-1.5 animate-pulse">
@@ -1242,7 +1242,7 @@ ${formattedAntonyms}
 
                         {syn.meaningBn && (
                           <p className="font-['Hind_Siliguri',sans-serif] font-semibold text-xs text-[#7440D6]">
-                            🇧🇩 {syn.meaningBn}
+                            {syn.meaningBn}
                           </p>
                         )}
                         {syn.nuanceNote && (
@@ -1422,7 +1422,7 @@ ${formattedAntonyms}
                           "{ex.english}"
                         </p>
                         <p className="font-['Hind_Siliguri',sans-serif] font-semibold text-xs sm:text-sm text-[#0B8F84]">
-                          🇧🇩 {ex.bengali}
+                          {ex.bengali}
                         </p>
                       </div>
                     ))}
