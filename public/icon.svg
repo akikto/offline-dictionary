@@ -8,7 +8,7 @@
       <stop offset="100%" stop-color="#FFF176" />
     </linearGradient>
 
-    <!-- Deep Blue Textured Background Gradient -->
+    <!-- Deep Blue Textured / Brushed Metallic Background -->
     <radialGradient id="blueBG" cx="50%" cy="50%" r="50%" fx="30%" fy="30%">
       <stop offset="0%" stop-color="#1C5288" />
       <stop offset="65%" stop-color="#0E335C" />
@@ -22,11 +22,18 @@
       <stop offset="100%" stop-color="#A67C1E" />
     </linearGradient>
 
-    <!-- Book Inner Page Gradient -->
+    <!-- Left page deep blue -->
     <linearGradient id="bookBlue" x1="0%" y1="0%" x2="100%" y2="0%">
       <stop offset="0%" stop-color="#1B4977" />
       <stop offset="50%" stop-color="#25629E" />
       <stop offset="100%" stop-color="#1B4977" />
+    </linearGradient>
+
+    <!-- Right page solid gold fill -->
+    <linearGradient id="pageGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFE082" />
+      <stop offset="45%" stop-color="#E5B842" />
+      <stop offset="100%" stop-color="#B8860B" />
     </linearGradient>
   </defs>
 
@@ -36,6 +43,10 @@
   <!-- Inner Blue Disc -->
   <circle cx="50" cy="50" r="43" fill="url(#blueBG)" />
   <circle cx="50" cy="50" r="41" fill="none" stroke="url(#goldBorder)" stroke-width="0.75" stroke-opacity="0.6" />
+
+  <!-- Subtle brushed-metal arcs -->
+  <path d="M18 42 Q 35 28, 55 36" stroke="#4A7AB0" stroke-width="0.6" opacity="0.35" fill="none" />
+  <path d="M22 58 Q 40 48, 62 55" stroke="#4A7AB0" stroke-width="0.5" opacity="0.25" fill="none" />
 
   <!-- Open Book Graphic -->
   <g transform="translate(18, 22) scale(0.64)">
@@ -55,10 +66,10 @@
       stroke-width="2.5"
     />
 
-    <!-- Right Page (Deep Blue with Gold Border) -->
+    <!-- Right Page (Gold with dark letter) -->
     <path
       d="M52 21 C 55 19, 73 12, 91 19 L 91 62 C 73 55, 55 62, 52 64 Z"
-      fill="url(#bookBlue)"
+      fill="url(#pageGold)"
       stroke="url(#bookGold)"
       stroke-width="2.5"
     />
@@ -66,25 +77,25 @@
     <!-- Center Spine Gold Stripe -->
     <path d="M48 21 L 52 21 L 52 64 L 48 64 Z" fill="url(#bookGold)" />
 
-    <!-- Left Page Letter: Bengali "শ" -->
+    <!-- Left Page Letter: Bengali "অ" (gold) -->
     <text
       x="28"
       y="48"
       fill="url(#bookGold)"
-      font-size="26"
+      font-size="28"
       font-weight="900"
       font-family="sans-serif"
       text-anchor="middle"
     >
-      শ
+      অ
     </text>
 
-    <!-- Right Page Letter: English "D" -->
+    <!-- Right Page Letter: English "D" (dark) -->
     <text
       x="71"
       y="48"
-      fill="url(#bookGold)"
-      font-size="26"
+      fill="#22314D"
+      font-size="28"
       font-weight="900"
       font-family="sans-serif"
       text-anchor="middle"
