@@ -1,6 +1,6 @@
 // Service Worker for Shobdokosh Offline Dictionary
 const BASE = '/offline-dictionary';
-const CACHE_NAME = 'shobdokosh-v3';
+const CACHE_NAME = 'shobdokosh-v4';
 const ASSETS_TO_CACHE = [
   `${BASE}/`,
   `${BASE}/index.html`,

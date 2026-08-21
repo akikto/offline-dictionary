@@ -19,7 +19,7 @@
       "src": "https://akikto.github.io/offline-dictionary/icon.png",
       "type": "image/png",
       "sizes": "512x512",
-      "purpose": "maskable"
+      "purpose": "any"
     }
   ],
   "start_url": "https://akikto.github.io/offline-dictionary/",
