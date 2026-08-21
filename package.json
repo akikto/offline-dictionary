@@ -12,6 +12,7 @@
     "lint": "tsc --noEmit",
     "android:generate": "node scripts/generate-android-twa.mjs",
     "android:signing": "node scripts/setup-android-signing.mjs",
+    "android:play-release": "node scripts/build-play-release.mjs",
     "android:build": "cd android && ./gradlew assembleRelease bundleRelease",
     "android:verify": "node scripts/verify-aab-package.mjs",
     "android:package": "npm run android:build && node scripts/copy-aab.mjs && npm run android:verify"

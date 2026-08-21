@@ -13,6 +13,7 @@ import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { findUploadKeystoreCandidates } from './find-upload-keystore.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, '..');
@@ -33,24 +34,15 @@ function normalizeFingerprint(value) {
 }
 
 function resolveSourceKeystore(argPath) {
-  const candidates = [
-    argPath,
-    process.env.SIGNING_KEYSTORE_PATH,
-    path.join(root, 'signing.keystore'),
-    path.join(androidDir, 'signing.keystore'),
-  ].filter(Boolean);
-
-  for (const candidate of candidates) {
-    const resolved = path.resolve(root, candidate);
-    if (fs.existsSync(resolved)) {
-      return resolved;
-    }
+  const candidates = findUploadKeystoreCandidates(argPath);
+  if (candidates.length > 0) {
+    return candidates[0];
   }
 
   console.error(
     '[setup-android-signing] Upload keystore not found.\n' +
-      '  Place PWABuilder/AI Studio signing.keystore in the repo root, then run:\n' +
-      '    node scripts/setup-android-signing.mjs ./signing.keystore',
+      '  Cursor চ্যাটে signing.keystore আপলোড করুন, অথবা repo root-এ রাখুন, তারপর:\n' +
+      '    npm run android:play-release',
   );
   process.exit(1);
 }
@@ -91,7 +83,7 @@ function verifyKeystore(keystorePath, storePassword, alias) {
   console.log('[setup-android-signing] Upload key fingerprints match Play Console.');
 }
 
-function main() {
+export function main() {
   const source = resolveSourceKeystore(process.argv[2]);
   const targetKeystore = path.join(androidDir, 'android.keystore');
   const propertiesPath = path.join(androidDir, 'keystore.properties');
@@ -116,4 +108,6 @@ function main() {
   console.log('[setup-android-signing] Run: npm run android:package');
 }
 
-main();
+if (import.meta.url === `file://${process.argv[1]}`) {
+  main();
+}

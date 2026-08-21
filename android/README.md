@@ -95,10 +95,14 @@ npm run android:package
 
 ### Bengali quick guide (স্থানীয় সেটআপ)
 
-1. AI Studio / PWABuilder থেকে ডাউনলোড করা **`signing.keystore`** ফাইলটি রাখুন প্রজেক্টের root-এ।
-2. টার্মিনালে চালান: `node scripts/setup-android-signing.mjs ./signing.keystore`
-3. তারপর: `npm run android:package`
-4. Play Console-এ আপলোড করুন: `android/dist/shobdokosh-1.0.1-versionCode-2.aab`
+**শুধু একটি ফাইল লাগবে:** AI Studio / PWABuilder থেকে ডাউনলোড করা `signing.keystore` (পাসওয়ার্ড/alias ইতিমধ্যে `signing-key-info.txt`-এ আছে)।
+
+1. Cursor চ্যাটে **`signing.keystore`** ফাইলটি আপলোড/অ্যাটাচ করুন (📎 আইকন)।
+2. Agent-কে বলুন: “signing.keystore দিয়েছি, AAB বানাও” — অথবা টার্মিনালে:
+   ```bash
+   npm run android:play-release
+   ```
+3. Play Console-এ আপলোড করুন: `android/dist/shobdokosh-1.0.1-versionCode-2.aab`
 
 **সতর্কতা:** GitHub Actions-এ বিল্ড করা AAB (`A3:F4:F0:B4…` SHA1) Play-এ আপলোড করবেন না — সেটা CI-এর অস্থায়ী কী দিয়ে সাইন করা।
 
