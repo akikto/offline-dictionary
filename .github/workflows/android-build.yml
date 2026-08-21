@@ -24,6 +24,7 @@ on:
 env:
   TWA_HOST: akikto.github.io
   TWA_START_URL: /offline-dictionary/
+  PLAY_PACKAGE_ID: studio.ai.service_5743.twa
   JAVA_VERSION: '17'
 
 jobs:

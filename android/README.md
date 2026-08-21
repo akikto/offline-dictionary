@@ -1,15 +1,22 @@
 # Android TWA packaging (শব্দকোষ)
 
-Trusted Web Activity wrapper for Play Store uploads. Package ID matches the existing listing:
+Trusted Web Activity wrapper for Play Store uploads.
 
-`studio.ai.service_5743.twa`
+**Quick reference:** [`docs/PLAYSTORE.md`](../docs/PLAYSTORE.md) — Bengali + English cheat sheet (package ID, URL, icons).
 
-## Versioning
+## Correct values (do not change casually)
 
 | Field | Value |
 | --- | --- |
-| `versionCode` (`appVersionCode`) | **2** |
-| `versionName` (`appVersion`) | **1.0.1** |
+| Package ID | `studio.ai.service_5743.twa` |
+| App URL | `https://akikto.github.io/offline-dictionary/` |
+| Manifest URL | `https://akikto.github.io/offline-dictionary/manifest.json` |
+| Icon source | `public/icon.png` (অ + D dictionary mark) |
+| `versionCode` | **≥ 2** (see `twa-manifest.json`) |
+
+Bubblewrap/PWABuilder auto-generates `io.github.akikto.twa` from the hostname — **wrong** for this Play listing. `scripts/generate-android-twa.mjs` forces `PLAY_PACKAGE_ID`.
+
+## Versioning
 
 Source of truth: [`twa-manifest.json`](./twa-manifest.json) → applied to `app/build.gradle` when regenerating.
 
@@ -18,70 +25,49 @@ Play Console rejected `versionCode` **1** (“already been used”). Upload an A
 ## Regenerate project
 
 ```bash
-# GitHub Pages project site (default for this repo):
-TWA_HOST=akikto.github.io TWA_START_URL=/offline-dictionary/ npm run android:generate
-
-# Other hosts:
-TWA_HOST=your-cloud-run-or-deploy-host.example.com npm run android:generate
+TWA_HOST=akikto.github.io \
+TWA_START_URL=/offline-dictionary/ \
+PLAY_PACKAGE_ID=studio.ai.service_5743.twa \
+npm run android:generate
 ```
 
-Icons are taken from `public/icon.png` (dictionary অ+D mark).
-
-## Build the AAB
+## Build and verify AAB
 
 Requires JDK 17+ and Android SDK command-line tools.
 
 ```bash
-# One-time Bubblewrap tooling config (JDK + SDK paths)
-mkdir -p ~/.bubblewrap
-# Example — adjust paths for your machine:
-# {"jdkPath":"/usr/lib/jvm/java-17-openjdk-amd64","androidSdkPath":"$HOME/Android/Sdk"}
-
-# Create / reuse the Play upload keystore (MUST match the key used for versionCode 1)
-# If you still have the original keystore from AI Studio / PWABuilder / Bubblewrap, point
-# signingKey.path at it in twa-manifest.json.
-
-cd android
-./gradlew bundleRelease
+npm run android:package
+# → builds AAB, copies to android/dist/, verifies package ID + versionCode
 ```
 
 Signed output (when signing is configured):
 
 - `android/app/build/outputs/bundle/release/app-release.aab`
-- Convenience copies (local builds): `android/dist/shobdokosh-1.0.1-versionCode-2.aab` and `android/dist/শব্দকোষ.aab`
+- Convenience copies: `android/dist/shobdokosh-versionCode-*.aab` and `android/dist/শব্দকোষ.aab`
 
-Verified with bundletool: `versionCode=2`, `versionName=1.0.1`, package `studio.ai.service_5743.twa`.
-
-Or with Bubblewrap (after `~/.bubblewrap/config.json` exists):
+Or manually:
 
 ```bash
 cd android
-npx bubblewrap build
-# → ./app-release-bundle.aab
+./gradlew bundleRelease
+node ../scripts/verify-aab-package.mjs
 ```
 
-## Signing blocker
+## Signing
 
 Play will only accept an update signed with the **same upload key** as the previous AAB. The SHA-256 in `public/.well-known/assetlinks.json` is:
 
 `49:56:54:FE:B4:3D:BF:37:1E:3C:A5:A2:56:9C:22:58:11:1D:64:B3:41:CC:44:2B:38:4B:B0:92:8C:71:BA:D5`
 
-Place that keystore at `android/android.keystore` (or update `signingKey` in `twa-manifest.json`) before a release build.
+Place that keystore at `android/android.keystore` (never commit) before a release build.
 
 ## CI artifacts (GitHub Actions)
 
 Workflow: [`.github/workflows/android-build.yml`](../.github/workflows/android-build.yml)
 
-On push/PR to `main` (or manual **Run workflow**), Actions builds and uploads:
+On push/PR to `main` (or manual **Run workflow**), Actions builds and uploads `android-apk` and `android-aab` artifacts.
 
-| Artifact | Contents |
-| --- | --- |
-| `android-apk` | Signed release APK for sideloading |
-| `android-aab` | Signed release AAB for Play Console |
-
-Download from the workflow run page → **Artifacts** (bottom of the summary).
-
-Optional repo secrets for Play-compatible signing (same key as versionCode 1):
+Optional repo secrets for Play-compatible signing:
 
 - `ANDROID_KEYSTORE_BASE64`
 - `ANDROID_KEYSTORE_PASSWORD`

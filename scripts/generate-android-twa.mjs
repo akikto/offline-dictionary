@@ -4,10 +4,10 @@
  * using the dictionary icon and version metadata from android/twa-manifest.json.
  *
  * Usage:
- *   TWA_HOST=your-deployed-host.example.com node scripts/generate-android-twa.mjs
+ *   TWA_HOST=akikto.github.io TWA_START_URL=/offline-dictionary/ npm run android:generate
  *
- * TWA_HOST (or APP_URL host) must be the HTTPS hostname that serves this PWA
- * (the same origin that hosts /.well-known/assetlinks.json).
+ * PLAY_PACKAGE_ID must stay studio.ai.service_5743.twa (existing Play listing).
+ * Bubblewrap/PWABuilder default io.github.akikto.twa is wrong for this app.
  */
 import http from 'node:http';
 import fs from 'node:fs';
@@ -23,6 +23,11 @@ const root = path.resolve(__dirname, '..');
 const androidDir = path.join(root, 'android');
 const publicDir = path.join(root, 'public');
 const manifestPath = path.join(androidDir, 'twa-manifest.json');
+
+/** Must match the existing Play Console listing — never io.github.akikto.twa */
+const PLAY_PACKAGE_ID =
+  process.env.PLAY_PACKAGE_ID || 'studio.ai.service_5743.twa';
+const DEFAULT_START_URL = '/offline-dictionary/';
 
 function resolveHost() {
   if (process.env.TWA_HOST) {
@@ -50,7 +55,12 @@ function resolveStartUrl() {
     return url.endsWith('/') ? url : `${url}/`;
   }
   const existing = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
-  return existing.startUrl || '/';
+  return existing.startUrl || DEFAULT_START_URL;
+}
+
+function pwaUrl(host, startUrl, file = '') {
+  const base = `https://${host}${startUrl}`;
+  return file ? `${base}${file.replace(/^\//, '')}` : base;
 }
 
 function contentType(filePath) {
@@ -114,6 +124,77 @@ $1    }`,
   fs.writeFileSync(buildGradlePath, gradle);
 }
 
+function patchGeneratedProject(host, startUrl, versionCode, versionName) {
+  const scopeUrl = pwaUrl(host, startUrl);
+  const manifestUrl = pwaUrl(host, startUrl, 'manifest.json');
+
+  const buildGradlePath = path.join(androidDir, 'app', 'build.gradle');
+  let gradle = fs.readFileSync(buildGradlePath, 'utf8');
+  gradle = gradle.replace(
+    /applicationId:\s*'[^']+'/,
+    `applicationId: '${PLAY_PACKAGE_ID}'`,
+  );
+  gradle = gradle.replace(
+    /namespace\s+"[^"]+"/,
+    `namespace "${PLAY_PACKAGE_ID}"`,
+  );
+  gradle = gradle.replace(
+    /applicationId\s+"[^"]+"/,
+    `applicationId "${PLAY_PACKAGE_ID}"`,
+  );
+  gradle = gradle.replace(
+    /versionCode\s+\d+/,
+    `versionCode ${versionCode}`,
+  );
+  gradle = gradle.replace(
+    /versionName\s+"[^"]+"/,
+    `versionName "${versionName}"`,
+  );
+  gradle = gradle.replace(
+    /launchUrl:\s*'[^']+'/,
+    `launchUrl: '${startUrl}'`,
+  );
+  gradle = gradle.replace(
+    /resValue "string", "webManifestUrl", '[^']+'/,
+    `resValue "string", "webManifestUrl", '${manifestUrl}'`,
+  );
+  gradle = gradle.replace(
+    /resValue "string", "fullScopeUrl", '[^']+'/,
+    `resValue "string", "fullScopeUrl", '${scopeUrl}'`,
+  );
+  fs.writeFileSync(buildGradlePath, gradle);
+
+  const stringsPath = path.join(androidDir, 'app', 'src', 'main', 'res', 'values', 'strings.xml');
+  let strings = fs.readFileSync(stringsPath, 'utf8');
+  strings = strings.replace(
+    /\\"site\\":\s*\\"https:\/\/[^"\\]+\\"/,
+    `\\"site\\": \\"${scopeUrl}\\"`,
+  );
+  fs.writeFileSync(stringsPath, strings);
+
+  const embeddedManifestPath = path.join(
+    androidDir,
+    'app',
+    'src',
+    'main',
+    'res',
+    'raw',
+    'web_app_manifest.json',
+  );
+  if (fs.existsSync(path.join(publicDir, 'manifest.json'))) {
+    const webManifest = JSON.parse(fs.readFileSync(path.join(publicDir, 'manifest.json'), 'utf8'));
+    webManifest.id = scopeUrl;
+    webManifest.start_url = scopeUrl;
+    webManifest.scope = scopeUrl;
+    for (const icon of webManifest.icons || []) {
+      if (icon.src.startsWith('http')) {
+        icon.src = pwaUrl(host, startUrl, path.basename(icon.src));
+      }
+    }
+    fs.writeFileSync(embeddedManifestPath, JSON.stringify(webManifest));
+  }
+}
+
 async function main() {
   const host = resolveHost();
   const startUrl = resolveStartUrl();
@@ -122,15 +203,26 @@ async function main() {
 
   try {
     const raw = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+    if (raw.packageId && raw.packageId !== PLAY_PACKAGE_ID) {
+      console.warn(
+        `[generate-android-twa] Overriding packageId ${raw.packageId} -> ${PLAY_PACKAGE_ID}`,
+      );
+    }
+
+    const versionCode = Math.max(Number(raw.appVersionCode) || 2, 2);
+    const versionName = raw.appVersionName || raw.appVersion || '1.0.1';
+    const scopeUrl = pwaUrl(host, startUrl);
+
+    raw.packageId = PLAY_PACKAGE_ID;
     raw.host = host;
     raw.startUrl = startUrl;
-    raw.appVersion = '1.0.1';
-    raw.appVersionName = '1.0.1';
-    raw.appVersionCode = 2;
+    raw.appVersion = versionName;
+    raw.appVersionName = versionName;
+    raw.appVersionCode = versionCode;
     raw.iconUrl = `${origin}/icon.png`;
     raw.maskableIconUrl = `${origin}/icon.png`;
     raw.webManifestUrl = `${origin}/manifest.json`;
-    raw.fullScopeUrl = `https://${host}${startUrl === '/' ? '/' : startUrl}`;
+    raw.fullScopeUrl = scopeUrl;
     raw.signingKey = {
       path: 'android.keystore',
       alias: raw.signingKey?.alias || 'android',
@@ -141,15 +233,16 @@ async function main() {
       JSON.stringify(
         {
           ...raw,
-          // Persist portable relative icon hints for humans; generation uses localhost URLs above.
+          packageId: PLAY_PACKAGE_ID,
           iconUrl: '../public/icon.png',
           maskableIconUrl: '../public/icon.png',
           webManifestUrl: null,
           host,
           startUrl,
-          appVersion: '1.0.1',
-          appVersionName: '1.0.1',
-          appVersionCode: 2,
+          appVersion: versionName,
+          appVersionName: versionName,
+          appVersionCode: versionCode,
+          fullScopeUrl: scopeUrl,
         },
         null,
         2,
@@ -158,13 +251,13 @@ async function main() {
 
     const twaManifest = new TwaManifest({
       ...raw,
-      appVersion: '1.0.1',
+      packageId: PLAY_PACKAGE_ID,
+      appVersion: versionName,
     });
 
     const generator = new TwaGenerator();
     const log = new ConsoleLog('generate-android-twa');
 
-    // Keep twa-manifest.json; regenerate the Bubblewrap Android project files around it.
     const preserve = new Set(['twa-manifest.json', 'README.md', '.gitignore']);
     for (const entry of fs.readdirSync(androidDir)) {
       if (preserve.has(entry)) continue;
@@ -173,10 +266,13 @@ async function main() {
 
     await generator.createTwaProject(androidDir, twaManifest, log);
     patchReleaseSigning(path.join(androidDir, 'app', 'build.gradle'));
+    patchGeneratedProject(host, startUrl, versionCode, versionName);
+
     console.log(`[generate-android-twa] Generated TWA project in ${androidDir}`);
-    console.log(`[generate-android-twa] packageId=${twaManifest.packageId}`);
-    console.log(`[generate-android-twa] versionCode=${twaManifest.appVersionCode} versionName=${twaManifest.appVersionName}`);
-    console.log(`[generate-android-twa] host=${twaManifest.host}`);
+    console.log(`[generate-android-twa] packageId=${PLAY_PACKAGE_ID}`);
+    console.log(`[generate-android-twa] versionCode=${versionCode} versionName=${versionName}`);
+    console.log(`[generate-android-twa] launchUrl=${scopeUrl}`);
+    console.log(`[generate-android-twa] manifestUrl=${pwaUrl(host, startUrl, 'manifest.json')}`);
   } finally {
     if (typeof server.closeAllConnections === 'function') {
       server.closeAllConnections();
