@@ -1,0 +1,115 @@
+<svg width="512" height="512" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Metallic Gold Gradient -->
+    <linearGradient id="goldBorder" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFE082" />
+      <stop offset="30%" stop-color="#D4AF37" />
+      <stop offset="70%" stop-color="#AA7C11" />
+      <stop offset="100%" stop-color="#FFF176" />
+    </linearGradient>
+
+    <!-- Deep Blue Textured / Brushed Metallic Background -->
+    <radialGradient id="blueBG" cx="50%" cy="50%" r="50%" fx="30%" fy="30%">
+      <stop offset="0%" stop-color="#1C5288" />
+      <stop offset="65%" stop-color="#0E335C" />
+      <stop offset="100%" stop-color="#081E38" />
+    </radialGradient>
+
+    <!-- Book Gold Trim Gradient -->
+    <linearGradient id="bookGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFF2B2" />
+      <stop offset="50%" stop-color="#E5B842" />
+      <stop offset="100%" stop-color="#A67C1E" />
+    </linearGradient>
+
+    <!-- Left page deep blue -->
+    <linearGradient id="bookBlue" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#1B4977" />
+      <stop offset="50%" stop-color="#25629E" />
+      <stop offset="100%" stop-color="#1B4977" />
+    </linearGradient>
+
+    <!-- Right page solid gold fill -->
+    <linearGradient id="pageGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFE082" />
+      <stop offset="45%" stop-color="#E5B842" />
+      <stop offset="100%" stop-color="#B8860B" />
+    </linearGradient>
+  </defs>
+
+  <!-- Outer Golden Border -->
+  <circle cx="50" cy="50" r="48" fill="url(#goldBorder)" stroke="#22314D" stroke-width="1.5" />
+
+  <!-- Inner Blue Disc -->
+  <circle cx="50" cy="50" r="43" fill="url(#blueBG)" />
+  <circle cx="50" cy="50" r="41" fill="none" stroke="url(#goldBorder)" stroke-width="0.75" stroke-opacity="0.6" />
+
+  <!-- Subtle brushed-metal arcs -->
+  <path d="M18 42 Q 35 28, 55 36" stroke="#4A7AB0" stroke-width="0.6" opacity="0.35" fill="none" />
+  <path d="M22 58 Q 40 48, 62 55" stroke="#4A7AB0" stroke-width="0.5" opacity="0.25" fill="none" />
+
+  <!-- Open Book Graphic -->
+  <g transform="translate(18, 22) scale(0.64)">
+    <!-- Book Shadow / Outer Gold Spine Base -->
+    <path
+      d="M5 65 C 25 58, 45 65, 50 68 C 55 65, 75 58, 95 65 L 95 18 C 75 10, 55 18, 50 20 C 45 18, 25 10, 5 18 Z"
+      fill="url(#bookGold)"
+      stroke="#22314D"
+      stroke-width="2"
+    />
+
+    <!-- Left Page (Deep Blue with Gold Border) -->
+    <path
+      d="M9 19 C 27 12, 45 19, 48 21 L 48 64 C 45 62, 27 55, 9 62 Z"
+      fill="url(#bookBlue)"
+      stroke="url(#bookGold)"
+      stroke-width="2.5"
+    />
+
+    <!-- Right Page (Gold with dark letter) -->
+    <path
+      d="M52 21 C 55 19, 73 12, 91 19 L 91 62 C 73 55, 55 62, 52 64 Z"
+      fill="url(#pageGold)"
+      stroke="url(#bookGold)"
+      stroke-width="2.5"
+    />
+
+    <!-- Center Spine Gold Stripe -->
+    <path d="M48 21 L 52 21 L 52 64 L 48 64 Z" fill="url(#bookGold)" />
+
+    <!-- Left Page Letter: Bengali "অ" (gold) -->
+    <text
+      x="28"
+      y="48"
+      fill="url(#bookGold)"
+      font-size="28"
+      font-weight="900"
+      font-family="sans-serif"
+      text-anchor="middle"
+    >
+      অ
+    </text>
+
+    <!-- Right Page Letter: English "D" (dark) -->
+    <text
+      x="71"
+      y="48"
+      fill="#22314D"
+      font-size="28"
+      font-weight="900"
+      font-family="sans-serif"
+      text-anchor="middle"
+    >
+      D
+    </text>
+  </g>
+
+  <!-- Magnifying Glass Overlaid Bottom Right -->
+  <g transform="translate(48, 48) scale(0.9)">
+    <circle cx="22" cy="22" r="14" fill="#0E335C" stroke="url(#goldBorder)" stroke-width="3.5" />
+    <circle cx="22" cy="22" r="10" fill="#25629E" fill-opacity="0.5" />
+    <path d="M16 16 C 18 14, 22 14, 24 15" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round" opacity="0.8" />
+    <path d="M32 32 L 42 42" stroke="url(#goldBorder)" stroke-width="5" stroke-linecap="round" />
+    <path d="M32 32 L 42 42" stroke="#22314D" stroke-width="1.5" stroke-linecap="round" />
+  </g>
+</svg>
