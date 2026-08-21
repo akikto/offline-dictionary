@@ -1,7 +1,6 @@
 /**
- * Copy built PWA assets to the repository root so legacy GitHub Pages
- * (source: main branch, path /) serves /offline-dictionary/icon.png and
- * /offline-dictionary/manifest.json correctly.
+ * Copy built PWA assets to the repository root for local inspection or
+ * manual publishing. CI deploys the dist/ folder via GitHub Actions Pages.
  */
 import fs from 'fs';
 import path from 'path';
