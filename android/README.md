@@ -58,13 +58,53 @@ npx bubblewrap build
 # → ./app-release-bundle.aab
 ```
 
-## Signing blocker
+## Signing (Play upload key)
 
-Play will only accept an update signed with the **same upload key** as the previous AAB. The SHA-256 in `public/.well-known/assetlinks.json` is:
+Play Console only accepts updates signed with the **same upload key** as the first release.
 
-`49:56:54:FE:B4:3D:BF:37:1E:3C:A5:A2:56:9C:22:58:11:1D:64:B3:41:CC:44:2B:38:4B:B0:92:8C:71:BA:D5`
+| | Fingerprint |
+| --- | --- |
+| **Required upload SHA1** (Play Console) | `24:7A:A9:16:C7:B3:60:7F:66:59:84:B8:84:4F:06:19:A0:B9:EA:0A` |
+| **Matching SHA256** (`assetlinks.json`) | `49:56:54:FE:B4:3D:BF:37:1E:3C:A5:A2:56:9C:22:58:11:1D:64:B3:41:CC:44:2B:38:4B:B0:92:8C:71:BA:D5` |
+| **CI temporary key SHA1** (do not upload) | `A3:F4:F0:B4:0F:B2:34:77:54:A4:0F:D5:8E:6C:EE:CA:32:CD:83:B5` |
 
-Place that keystore at `android/android.keystore` (or update `signingKey` in `twa-manifest.json`) before a release build.
+PWABuilder / AI Studio creates `signing.keystore` plus a `signing-key-info.txt` with:
+
+- **Alias:** `my-key-alias`
+- **Keystore + key password:** from your `signing-key-info.txt` (not committed)
+
+### One-time setup
+
+1. Copy your original `signing.keystore` into the repo root (same folder as `signing-key-info.txt`).
+2. Run:
+
+```bash
+node scripts/setup-android-signing.mjs ./signing.keystore
+# or: npm run android:signing -- ./signing.keystore
+```
+
+This copies the keystore to `android/android.keystore` and writes `android/keystore.properties` (both gitignored).
+
+3. Build and verify:
+
+```bash
+npm run android:package
+```
+
+`npm run android:verify` checks package ID, `versionCode`, and upload-key SHA1.
+
+### Bengali quick guide (স্থানীয় সেটআপ)
+
+1. AI Studio / PWABuilder থেকে ডাউনলোড করা **`signing.keystore`** ফাইলটি রাখুন প্রজেক্টের root-এ।
+2. টার্মিনালে চালান: `node scripts/setup-android-signing.mjs ./signing.keystore`
+3. তারপর: `npm run android:package`
+4. Play Console-এ আপলোড করুন: `android/dist/shobdokosh-1.0.1-versionCode-2.aab`
+
+**সতর্কতা:** GitHub Actions-এ বিল্ড করা AAB (`A3:F4:F0:B4…` SHA1) Play-এ আপলোড করবেন না — সেটা CI-এর অস্থায়ী কী দিয়ে সাইন করা।
+
+## Signing blocker (legacy note)
+
+Place the Play upload keystore at `android/android.keystore` (or run `scripts/setup-android-signing.mjs`) before a release build.
 
 ## CI artifacts (GitHub Actions)
 
@@ -81,9 +121,11 @@ Download from the workflow run page → **Artifacts** (bottom of the summary).
 
 Optional repo secrets for Play-compatible signing (same key as versionCode 1):
 
-- `ANDROID_KEYSTORE_BASE64`
-- `ANDROID_KEYSTORE_PASSWORD`
-- `ANDROID_KEY_ALIAS`
-- `ANDROID_KEY_PASSWORD`
+- `ANDROID_KEYSTORE_BASE64` — base64 of original `signing.keystore`
+- `ANDROID_KEYSTORE_PASSWORD` — keystore password from `signing-key-info.txt`
+- `ANDROID_KEY_ALIAS` — **`my-key-alias`**
+- `ANDROID_KEY_PASSWORD` — key password (usually same as keystore password)
 
-Without these secrets, CI uses a temporary key so you can still download installable builds; Play Store updates require the original upload keystore.
+Encode locally: `base64 -w0 signing.keystore > signing.keystore.b64`
+
+Without these secrets, CI uses a temporary key (`SHA1 A3:F4:F0:B4…`) so you can still download installable builds; **Play Store uploads require the original upload keystore** (`SHA1 24:7A:A9:16…`).

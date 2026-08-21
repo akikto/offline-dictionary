@@ -1,5 +1,7 @@
 android.keystore
 *.keystore
+keystore.properties
+signing.keystore
 *.jks
 local.properties
 .gradle/

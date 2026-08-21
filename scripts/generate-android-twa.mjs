@@ -90,29 +90,63 @@ function startStaticServer() {
 
 function patchReleaseSigning(buildGradlePath) {
   let gradle = fs.readFileSync(buildGradlePath, 'utf8');
+  if (gradle.includes('keystorePropertiesFile')) {
+    return;
+  }
+
+  const signingBlock = `
+    def releaseStoreFile = null
+    def releaseStorePassword = null
+    def releaseKeyAlias = null
+    def releaseKeyPassword = null
+
+    def keystorePropertiesFile = rootProject.file('keystore.properties')
+    if (keystorePropertiesFile.exists()) {
+        def keystoreProperties = new Properties()
+        keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+        releaseStoreFile = keystoreProperties['RELEASE_STORE_FILE']
+        releaseStorePassword = keystoreProperties['RELEASE_STORE_PASSWORD']
+        releaseKeyAlias = keystoreProperties['RELEASE_KEY_ALIAS']
+        releaseKeyPassword = keystoreProperties['RELEASE_KEY_PASSWORD']
+    } else if (project.hasProperty('RELEASE_STORE_FILE')) {
+        releaseStoreFile = RELEASE_STORE_FILE
+        releaseStorePassword = RELEASE_STORE_PASSWORD
+        releaseKeyAlias = RELEASE_KEY_ALIAS
+        releaseKeyPassword = RELEASE_KEY_PASSWORD
+    }
+
+    signingConfigs {
+        release {
+            if (releaseStoreFile) {
+                storeFile file("../" + releaseStoreFile)
+                storePassword releaseStorePassword
+                keyAlias releaseKeyAlias
+                keyPassword releaseKeyPassword
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            if (releaseStoreFile) {
+                signingConfig signingConfigs.release
+            }
+        }
+    }`;
+
   if (gradle.includes('signingConfigs')) {
+    gradle = gradle.replace(
+      /def releaseStoreFile = null[\s\S]*?buildTypes \{\s*\n\s*release \{\s*\n\s*minifyEnabled true[\s\S]*?\n\s*\}\s*\n\s*\}/,
+      signingBlock.trim(),
+    );
+    fs.writeFileSync(buildGradlePath, gradle);
     return;
   }
 
   gradle = gradle.replace(
     /(\s+)buildTypes \{\s*\n\s*release \{\s*\n\s*minifyEnabled true\s*\n\s*\}/,
-    `$1signingConfigs {
-$1    release {
-$1        if (project.hasProperty('RELEASE_STORE_FILE')) {
-$1            storeFile file("../" + RELEASE_STORE_FILE)
-$1            storePassword RELEASE_STORE_PASSWORD
-$1            keyAlias RELEASE_KEY_ALIAS
-$1            keyPassword RELEASE_KEY_PASSWORD
-$1        }
-$1    }
-$1}
-$1buildTypes {
-$1    release {
-$1        minifyEnabled true
-$1        if (project.hasProperty('RELEASE_STORE_FILE')) {
-$1            signingConfig signingConfigs.release
-$1        }
-$1    }`,
+    signingBlock,
   );
 
   fs.writeFileSync(buildGradlePath, gradle);
@@ -143,7 +177,7 @@ async function main() {
     raw.fullScopeUrl = `https://${host}${startUrl === '/' ? '/' : startUrl}`;
     raw.signingKey = {
       path: 'android.keystore',
-      alias: raw.signingKey?.alias || 'android',
+      alias: raw.signingKey?.alias || 'my-key-alias',
     };
 
     fs.writeFileSync(
@@ -176,7 +210,7 @@ async function main() {
     const log = new ConsoleLog('generate-android-twa');
 
     // Keep twa-manifest.json; regenerate the Bubblewrap Android project files around it.
-    const preserve = new Set(['twa-manifest.json', 'README.md', '.gitignore']);
+    const preserve = new Set(['twa-manifest.json', 'README.md', '.gitignore', 'keystore.properties.example']);
     for (const entry of fs.readdirSync(androidDir)) {
       if (preserve.has(entry)) continue;
       fs.rmSync(path.join(androidDir, entry), { recursive: true, force: true });

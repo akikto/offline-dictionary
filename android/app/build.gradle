@@ -150,19 +150,40 @@ android {
 
         
     }
+
+    def releaseStoreFile = null
+    def releaseStorePassword = null
+    def releaseKeyAlias = null
+    def releaseKeyPassword = null
+
+    def keystorePropertiesFile = rootProject.file('keystore.properties')
+    if (keystorePropertiesFile.exists()) {
+        def keystoreProperties = new Properties()
+        keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+        releaseStoreFile = keystoreProperties['RELEASE_STORE_FILE']
+        releaseStorePassword = keystoreProperties['RELEASE_STORE_PASSWORD']
+        releaseKeyAlias = keystoreProperties['RELEASE_KEY_ALIAS']
+        releaseKeyPassword = keystoreProperties['RELEASE_KEY_PASSWORD']
+    } else if (project.hasProperty('RELEASE_STORE_FILE')) {
+        releaseStoreFile = RELEASE_STORE_FILE
+        releaseStorePassword = RELEASE_STORE_PASSWORD
+        releaseKeyAlias = RELEASE_KEY_ALIAS
+        releaseKeyPassword = RELEASE_KEY_PASSWORD
+    }
+
     signingConfigs {
 
         release {
 
-            if (project.hasProperty('RELEASE_STORE_FILE')) {
+            if (releaseStoreFile) {
 
-                storeFile file("../" + RELEASE_STORE_FILE)
+                storeFile file("../" + releaseStoreFile)
 
-                storePassword RELEASE_STORE_PASSWORD
+                storePassword releaseStorePassword
 
-                keyAlias RELEASE_KEY_ALIAS
+                keyAlias releaseKeyAlias
 
-                keyPassword RELEASE_KEY_PASSWORD
+                keyPassword releaseKeyPassword
 
             }
 
@@ -176,7 +197,7 @@ android {
 
             minifyEnabled true
 
-            if (project.hasProperty('RELEASE_STORE_FILE')) {
+            if (releaseStoreFile) {
 
                 signingConfig signingConfigs.release
 
